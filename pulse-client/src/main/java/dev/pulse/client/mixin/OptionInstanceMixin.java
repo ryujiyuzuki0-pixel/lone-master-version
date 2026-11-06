@@ -28,7 +28,7 @@ public abstract class OptionInstanceMixin<T> {
             if (mc == null || mc.options == null) return;
             g = pulse$gamma = mc.options.gamma();
         }
-        if (this != g || !(cir.getReturnValue() instanceof Double vanilla)) return;
+        if ((Object) this != g || !(cir.getReturnValue() instanceof Double vanilla)) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.screen != null && mc.screen.getClass().getName().contains("VideoSettingsScreen")) return;
         cir.setReturnValue((T) Double.valueOf(CustomBrightnessModule.gamma(vanilla)));
