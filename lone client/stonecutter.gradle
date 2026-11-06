@@ -1,7 +1,0 @@
-plugins {
-    id 'dev.kikugie.stonecutter'
-}
-
-// The version src/ is currently set up for. Change it with the Stonecutter
-// "Set active project" Gradle task, not by hand.
-stonecutter.active "1.21.11" /* [SC] DO NOT EDIT */
