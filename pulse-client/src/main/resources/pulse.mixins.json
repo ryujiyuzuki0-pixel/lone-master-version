@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.pulse.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "AbstractClientPlayerMixin",
+    "MinecraftMixin",
+    "DebugOverlayMixin",
+    "LocalPlayerMixin",
+    "MultiPlayerGameModeMixin",
+    "FogRendererMixin",
+    "LivingEntityMixin",
+    "OptionInstanceMixin",
+    "ContainerScreenMixin",
+    "ItemEntityMixin",
+    "ItemEntityRendererMixin",
+    "PlayerCapeModelMixin",
+    "PlayerTabOverlayMixin",
+    "PlayerNameMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
