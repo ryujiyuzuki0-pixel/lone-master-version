@@ -73,6 +73,15 @@ public final class PotionModule extends Module {
         return out;
     }
 
+    /** The effect's own color, brightened a little so dark effects stay readable without a background. */
+    private static int lighten(int rgb) {
+        int r = (rgb >> 16) & 0xFF, gr = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+        r += (255 - r) * 35 / 100;
+        gr += (255 - gr) * 35 / 100;
+        b += (255 - b) * 35 / 100;
+        return 0xFF000000 | (r << 16) | (gr << 8) | b;
+    }
+
     private static String fmt(int totalSeconds) {
         return String.format("%02d:%02d", totalSeconds / 60, totalSeconds % 60);
     }
@@ -126,9 +135,11 @@ public final class PotionModule extends Module {
         if (lunar()) {
             int y = 0;
             for (Entry e : entries(mc)) {
-                icon(g, e.sprite(), 0, y + 2);
-                g.drawString(Theme.font(), Theme.fit(e.name(), w - 24), 23, y + 3, 0xFFFFFFFF, true);
-                g.drawString(Theme.font(), e.time(), 23, y + 13, 0xFFAAAAAA, true);
+                icon(g, e.sprite(), w - 18, y + 2);
+                String name = Theme.fit(e.name(), w - 24);
+                int right = w - 22;
+                g.drawString(Theme.font(), name, right - Theme.width(name), y + 3, lighten(e.color()), true);
+                g.drawString(Theme.font(), e.time(), right - Theme.width(e.time()), y + 13, 0xFFFFFFFF, true);
                 y += LUNAR_ROW;
             }
             return;
