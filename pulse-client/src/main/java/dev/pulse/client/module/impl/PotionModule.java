@@ -26,10 +26,10 @@ public final class PotionModule extends Module {
 
     private record Entry(String name, String time, int color, boolean low, String sprite) {}
 
-    private final ChoiceSetting style = add(new ChoiceSetting("Style", 0, "Vanilla", "Compact list"));
-    private final BoolSetting showTime = add(new BoolSetting("Show duration", true), () -> this.style.index == 1);
+    private final ChoiceSetting style = add(new ChoiceSetting("Style", 0, "Lunar", "Vanilla", "Compact list"));
+    private final BoolSetting showTime = add(new BoolSetting("Show duration", true), () -> this.style.index == 2);
     private final BoolSetting showLevel = add(new BoolSetting("Show level", true));
-    private final BoolSetting marker = add(new BoolSetting("Color marker", true), () -> this.style.index == 1);
+    private final BoolSetting marker = add(new BoolSetting("Color marker", true), () -> this.style.index == 2);
     private final ChoiceSetting sort = add(new ChoiceSetting("Sort", 0, "Longest first", "Shortest first", "Name"));
     private final SliderSetting lowAt = add(new SliderSetting("Low warning", 0, 30, 1, 10, "s").zero("Off"), "Layout");
     private final SliderSetting maxRows = add(new SliderSetting("Max rows", 1, 12, 1, 8, ""), "Layout");
@@ -77,9 +77,15 @@ public final class PotionModule extends Module {
         return String.format("%02d:%02d", totalSeconds / 60, totalSeconds % 60);
     }
 
-    private boolean vanilla() {
+    private boolean lunar() {
         return style.index == 0;
     }
+
+    private boolean vanilla() {
+        return style.index == 1;
+    }
+
+    private static final int LUNAR_ROW = 22;
 
     private static final int CARD_H = 32, CARD_GAP = 2;
 
@@ -92,12 +98,13 @@ public final class PotionModule extends Module {
     public int height(Minecraft mc) {
         int n = entries(mc).size();
         if (n == 0) return 0;
+        if (lunar()) return n * LUNAR_ROW;
         return vanilla() ? n * CARD_H + (n - 1) * CARD_GAP : 8 + n * 13;
     }
 
     @Override
     public void drawBackground(GuiGraphics g, int w, int h) {
-        if (vanilla()) return; // each effect draws its own card
+        if (lunar() || vanilla()) return; // no panel: Lunar has none, Vanilla draws a card per effect
         super.drawBackground(g, w, h);
     }
 
@@ -116,6 +123,16 @@ public final class PotionModule extends Module {
 
     @Override
     public void draw(GuiGraphics g, Minecraft mc, int w, int h) {
+        if (lunar()) {
+            int y = 0;
+            for (Entry e : entries(mc)) {
+                icon(g, e.sprite(), 0, y + 2);
+                g.drawString(Theme.font(), Theme.fit(e.name(), w - 24), 23, y + 3, 0xFFFFFFFF, true);
+                g.drawString(Theme.font(), e.time(), 23, y + 13, 0xFFAAAAAA, true);
+                y += LUNAR_ROW;
+            }
+            return;
+        }
         if (vanilla()) {
             int y = 0;
             for (Entry e : entries(mc)) {
