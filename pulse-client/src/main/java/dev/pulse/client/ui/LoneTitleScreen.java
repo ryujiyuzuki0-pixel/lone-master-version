@@ -1,5 +1,6 @@
 package dev.pulse.client.ui;
 
+import dev.pulse.client.Brand;
 import dev.pulse.client.PulseClient;
 import dev.pulse.client.module.ModuleManager;
 import dev.pulse.client.module.impl.ClientModule;
@@ -21,11 +22,11 @@ import org.lwjgl.glfw.GLFW;
  * "Mods" lists the mods installed in your game; "Lone Mods" opens the client's built-in modules.
  */
 public class LoneTitleScreen extends Screen {
-    private static final String[] LABELS = {"SinglePlayer", "Multiplayer", "Cosmetic", "Mods", "Settings", "Lone Mods"};
-    private static final int WARDROBE = 6;
+    private static final String[] LABELS = {"SinglePlayer", "Multiplayer", "Cosmetic", "Mods", "Settings", "Lone Mods", "Texture Packs"};
+    private static final int WARDROBE = 7;
 
     private final long start = System.currentTimeMillis();
-    private final float[] hover = new float[7];
+    private final float[] hover = new float[8];
     private int selected = -1;
     private boolean keyboardSel;
     private float quitHover;
@@ -39,7 +40,7 @@ public class LoneTitleScreen extends Screen {
     private int quitX, quitY, quitW = 44, quitH = 15;
 
     public LoneTitleScreen() {
-        super(Component.literal("Lone Client"));
+        super(Component.literal(Brand.NAME));
     }
 
     /** True when the Lone title screen should replace the vanilla one. */
@@ -57,7 +58,7 @@ public class LoneTitleScreen extends Screen {
 
     private void layout() {
         bh = Math.max(15, Math.round(height * 0.068f));
-        step = Math.max(bh + 4, Math.round(height * 0.083f));
+        step = Math.max(bh + 4, Math.round(height * 0.075f)); // 7 rows now
         bw = Math.max(100, Math.min(170, (int) (width * 0.2f)));
         bx = (width - bw) / 2;
         y0 = Math.round(height * 0.377f) - bh / 2;
@@ -77,7 +78,7 @@ public class LoneTitleScreen extends Screen {
     }
 
     private int btnY(int i) {
-        return i < 5 ? y0 + i * step : y0 + 5 * step + extra;
+        return i < 5 ? y0 + i * step : y0 + i * step + extra; // the last two sit apart from the vanilla-style five
     }
 
     private int hit(double mx, double my) {
@@ -132,7 +133,7 @@ public class LoneTitleScreen extends Screen {
         for (int i = 0; i < LABELS.length; i++) {
             float a = Theme.ease((float) ((elapsed - 0.15 - i * 0.07) / 0.45));
             int slide = Math.round((1 - a) * 14);
-            drawButton(g, bx - slide, btnY(i), bw - (i == 5 ? 6 : 0), bh, LABELS[i], hover[i], a, i == 5 ? 3 : 0);
+            drawButton(g, bx - slide, btnY(i), bw - (i >= 5 ? 6 : 0), bh, LABELS[i], hover[i], a, i >= 5 ? 3 : 0);
         }
         drawFooter(g, intro);
     }
@@ -163,8 +164,13 @@ public class LoneTitleScreen extends Screen {
     private void drawLogo(GuiGraphics g, float intro, double t) {
         int logoY = Math.round(height * 0.14f) - Math.round((1 - intro) * 10);
         float scale = Math.max(1.6f, Math.min(2.8f, height / 105f));
-        Component text = Component.literal("Lone Client").withStyle(ChatFormatting.BOLD);
-        int textW = (int) (Theme.font().width(text) * scale);
+        // Two-tier wordmark: LONE (bold, large) + CLIENT (small, letter-spaced, bottom-aligned to it).
+        Component word = Component.literal(Brand.WORD).withStyle(ChatFormatting.BOLD);
+        float subScale = scale * 0.5f;
+        int mainW = (int) (Theme.font().width(word) * scale);
+        int gap = Math.max(5, (int) (scale * 3));
+        int subW = spacedWidth(Brand.SUB, subScale);
+        int textW = mainW + gap + subW;
         int emblem = (int) (28 * Math.max(1f, scale / 2.2f));
         int total = emblem + 8 + textW;
         int x0 = (width - total) / 2;
@@ -187,13 +193,17 @@ public class LoneTitleScreen extends Screen {
         drawEmblem(g, x0 + emblem / 2 + 1, cy + 1, emblem / 2, Theme.alpha(0xFF2A58C8, 0.55f * intro));
         drawEmblem(g, x0 + emblem / 2, cy, emblem / 2, Theme.alpha(0xFFFFFFFF, intro));
 
+        int subY = Math.round(cy - 4 * scale + 8 * scale - 8 * subScale);
         for (int pass = 0; pass < 2; pass++) {
+            float off = pass == 0 ? scale * 0.5f : 0;
+            int shade = pass == 0 ? Theme.alpha(0xFF2A58C8, 0.5f * intro) : Theme.alpha(0xFFFFFFFF, intro);
             g.pose().pushMatrix();
-            g.pose().translate(x0 + emblem + 8 + (pass == 0 ? scale * 0.5f : 0), cy - 4 * scale + (pass == 0 ? scale * 0.5f : 0));
+            g.pose().translate(x0 + emblem + 8 + off, cy - 4 * scale + off);
             g.pose().scale(scale, scale);
-            g.drawString(Theme.font(), text, 0, 0,
-                    pass == 0 ? Theme.alpha(0xFF2A58C8, 0.5f * intro) : Theme.alpha(0xFFFFFFFF, intro), false);
+            g.drawString(Theme.font(), word, 0, 0, shade, false);
             g.pose().popMatrix();
+            drawSpaced(g, Brand.SUB, x0 + emblem + 8 + mainW + gap + Math.round(off), subY + Math.round(off), subScale,
+                    pass == 0 ? shade : Theme.alpha(0xFFDCE8FF, 0.95f * intro));
         }
 
         // glow line under the logo
@@ -208,6 +218,22 @@ public class LoneTitleScreen extends Screen {
         }
         float bloom = 0.5f + 0.5f * (float) Math.sin(t * 1.5);
         Theme.roundRect(g, width / 2 - 30, ly - 1, 60, 3, 1, Theme.alpha(0xFFFFFFFF, (0.45f + 0.3f * bloom) * intro));
+    }
+
+    private static int spacedWidth(String s, float scale) {
+        int w = 0;
+        for (int i = 0; i < s.length(); i++) w += Math.round((Theme.width(String.valueOf(s.charAt(i))) + 1.5f) * scale);
+        return w;
+    }
+
+    /** Draws small caps-style text with a little extra space between letters. */
+    private static void drawSpaced(GuiGraphics g, String s, int x, int y, float scale, int color) {
+        float cx = x;
+        for (int i = 0; i < s.length(); i++) {
+            String ch = String.valueOf(s.charAt(i));
+            Theme.scaledText(g, ch, Math.round(cx), y, scale, color, false);
+            cx += (Theme.width(ch) + 1.5f) * scale;
+        }
     }
 
     private static float hash(int n) {
@@ -244,7 +270,7 @@ public class LoneTitleScreen extends Screen {
     private void drawFooter(GuiGraphics g, float intro) {
         ClientModule cm = ModuleManager.client();
         if (cm == null || cm.titleVersion()) {
-            g.drawString(Theme.font(), "Lone Client " + PulseClient.shortVersion(), 8, height - 14,
+            g.drawString(Theme.font(), Brand.versionLine(), 8, height - 14,
                     Theme.alpha(0xFF2A4A9A, 0.85f * intro), false);
         }
         int bgc = Theme.lerp(Theme.alpha(0xFFFFFFFF, 0.55f), Theme.alpha(0xFF6C97F2, 0.95f), quitHover);
@@ -263,6 +289,7 @@ public class LoneTitleScreen extends Screen {
             case 3 -> minecraft.setScreen(new InstalledModsScreen(this));
             case 4 -> minecraft.setScreen(new OptionsScreen(this, minecraft.options)); // the real Minecraft settings
             case 5 -> minecraft.setScreen(new MenuScreen(this, MenuScreen.Page.HUD));
+            case 6 -> minecraft.setScreen(new PacksScreen(this));
             default -> {
             }
         }
