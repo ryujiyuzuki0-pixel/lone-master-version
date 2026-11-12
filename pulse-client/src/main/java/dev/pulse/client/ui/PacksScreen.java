@@ -6,7 +6,6 @@ import dev.pulse.client.packs.PackThumbs;
 import dev.pulse.client.packs.PacksMcApi;
 import dev.pulse.client.packs.PacksSettings;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -192,12 +191,34 @@ public class PacksScreen extends Screen {
         }
         String problem = PackImporter.arm(PacksSettings.autoActivate(), this::onInstalled);
         waiting = problem == null;
-        Util.getPlatform().openUri(p.downloadUrl());
+        openUri(p.downloadUrl());
         say(problem == null ? "Download it in your browser. It installs here the moment it finishes." : problem,
                 problem == null ? Theme.L_TEXT : Theme.WARN);
     }
 
     // ------------------------------------------------------------------ helpers
+
+    /**
+     * Opens a link in the default browser without touching net.minecraft.Util, whose package differs between
+     * Minecraft versions. Uses the OS's own opener (no shell, so the URL can't be interpreted as a command).
+     */
+    private static void openUri(String uri) {
+        if (uri == null || !(uri.startsWith("https://") || uri.startsWith("http://"))) return;
+        String os = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
+        try {
+            ProcessBuilder pb;
+            if (os.contains("win")) pb = new ProcessBuilder("rundll32", "url.dll,FileProtocolHandler", uri);
+            else if (os.contains("mac")) pb = new ProcessBuilder("open", uri);
+            else pb = new ProcessBuilder("xdg-open", uri);
+            pb.start();
+        } catch (Exception e) {
+            try {
+                if (java.awt.Desktop.isDesktopSupported()) java.awt.Desktop.getDesktop().browse(java.net.URI.create(uri));
+            } catch (Throwable ignored) {
+                // no way to open a browser here
+            }
+        }
+    }
 
     private float hv(String id) {
         float cur = hover.getOrDefault(id, 0f);
@@ -608,12 +629,12 @@ public class PacksScreen extends Screen {
         switch (id) {
             case "done" -> onClose();
             case "retry" -> reload();
-            case "getkey" -> Util.getPlatform().openUri(PacksMcApi.KEY_PAGE);
+            case "getkey" -> openUri(PacksMcApi.KEY_PAGE);
             case "savekey" -> saveKey();
             case "dl" -> download(selected);
             case "open" -> {
                 PackInfo p = selected;
-                if (p != null && PacksMcApi.isPacksMcUrl(p.downloadUrl())) Util.getPlatform().openUri(p.downloadUrl());
+                if (p != null && PacksMcApi.isPacksMcUrl(p.downloadUrl())) openUri(p.downloadUrl());
             }
             case "gprev" -> galleryIdx--;
             case "gnext" -> galleryIdx++;
