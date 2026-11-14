@@ -1,0 +1,12 @@
+-proc:none
+-Xmaxerrs
+3000
+-d
+/tmp/out2
+dev/pulse/client/cosmetics/Cosmetic.java
+dev/pulse/client/cosmetics/CosmeticCategory.java
+dev/pulse/client/cosmetics/CosmeticRegistry.java
+dev/pulse/client/cosmetics/CosmeticsManager.java
+dev/pulse/client/module/impl/CapeModule.java
+dev/pulse/client/ui/MenuScreen.java
+dev/pulse/client/ui/PlayerPreview.java
