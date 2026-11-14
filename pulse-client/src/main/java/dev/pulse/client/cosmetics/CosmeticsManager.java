@@ -12,6 +12,7 @@ import net.minecraft.core.ClientAsset;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.PowerParticleOption;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.phys.Vec3;
@@ -202,7 +203,7 @@ public final class CosmeticsManager {
             case "dust" -> new DustParticleOptions(c.color() & 0xFFFFFF, 1.0f);
             case "glow" -> ParticleTypes.GLOW;
             case "portal" -> ParticleTypes.PORTAL;
-            case "dragon_breath" -> ParticleTypes.DRAGON_BREATH;
+            case "dragon_breath" -> PowerParticleOption.create(ParticleTypes.DRAGON_BREATH, 1.0f);
             case "spore_blossom_air" -> ParticleTypes.SPORE_BLOSSOM_AIR;
             case "witch" -> ParticleTypes.WITCH;
             case "happy_villager" -> ParticleTypes.HAPPY_VILLAGER;
