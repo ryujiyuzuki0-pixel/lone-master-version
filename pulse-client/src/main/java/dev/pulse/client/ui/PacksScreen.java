@@ -6,7 +6,11 @@ import dev.pulse.client.packs.PackThumbs;
 import dev.pulse.client.packs.PacksMcApi;
 import dev.pulse.client.packs.PacksSettings;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+//? if >=1.21.11 {
+import net.minecraft.util.Util;
+//?} else {
+/*import net.minecraft.Util;
+*///?}
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
