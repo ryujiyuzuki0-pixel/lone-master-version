@@ -1,0 +1,7 @@
+-proc:none
+-Xmaxerrs
+5000
+-d
+/tmp/out6
+dev/pulse/client/ui/HudEditorScreen.java
+dev/pulse/client/ui/HudLayouts.java

@@ -1,0 +1,10 @@
+-proc:none
+-Xmaxerrs
+5000
+-d
+/tmp/out4
+dev/pulse/client/module/impl/ZoomModule.java
+dev/pulse/client/module/impl/FovModule.java
+dev/pulse/client/mixin/OptionInstanceMixin.java
+dev/pulse/client/mixin/MouseHandlerMixin.java
+dev/pulse/client/ui/HudRenderer.java
